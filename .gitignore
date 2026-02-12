@@ -1,5 +1,7 @@
 # Local, host-specific vars (never commit)
 vars/local.nix
+hosts/*/hardware-configuration.nix
+**/hardware-configuration.nix
 
 # Editor/OS noise
 *.swp
