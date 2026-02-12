@@ -1,0 +1,16 @@
+# Local, host-specific vars (never commit)
+vars/local.nix
+
+# Editor/OS noise
+*.swp
+*.swo
+.DS_Store
+
+# Secrets (repo-local patterns)
+*.secrets
+*.secret
+*.env
+*.env.*
+secrets/
+**/secrets/
+
