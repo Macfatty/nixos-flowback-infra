@@ -169,6 +169,3 @@ Keep secrets out of git in both phases (tokens, deploy keys, runner tokens).
 * Prefer host-specific settings in `vars/local.nix` so onboarding a new machine is mostly “copy + edit variables”.
 
 ```
-
-
-```
