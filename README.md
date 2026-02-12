@@ -167,5 +167,3 @@ Keep secrets out of git in both phases (tokens, deploy keys, runner tokens).
 * `hardware-configuration.nix` is intentionally **ignored** because it is tied to disks, UUIDs, and hardware layout.
 * `remote-unlock.nix` depends on secrets existing under `/etc/secrets/` on the target host (only if enabled).
 * Prefer host-specific settings in `vars/local.nix` so onboarding a new machine is mostly “copy + edit variables”.
-
-```
