@@ -1,8 +1,16 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, vars, ... }:
 
-let
-  vars = import ../vars/local.nix;
-in
+/*
+  Module: aliases.nix
+
+  What it does:
+  - Defines system-wide shell aliases for Flowback helpers, Compose ops, and rebuilds.
+
+  How to use:
+  - Import this module on a host.
+  - Ensure the host passes `vars` via `_module.args.vars` (same pattern as base.nix).
+*/
+
 {
   environment.shellAliases = {
     # Docs / helpers

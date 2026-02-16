@@ -1,7 +1,6 @@
-````md
 # nixos-flowback-infra
 
-Infrastructure-as-code for the Flowback environment on **NixOS** (no flakes).  
+Infrastructure-as-code for the Flowback environment on **NixOS** (no flakes).
 Focus: **secure, portable, reproducible** host configuration for internal use.
 
 The goal is that a new host can be set up by changing **only variables** (and providing local secrets), not by rewriting modules.
@@ -10,18 +9,18 @@ The goal is that a new host can be set up by changing **only variables** (and pr
 
 ## Requirements
 
-- A working NixOS installation on the target host
-- SSH access to the host
-- Optional (only if you enable remote unlock): initrd SSH host keys available under `/etc/secrets/`
+* A working NixOS installation on the target host
+* SSH access to the host
+* Optional (only if you enable remote unlock): initrd SSH host keys available under `/etc/secrets/`
 
 ---
 
 ## Quick start
 
-1) Copy `vars/example.nix` → `vars/local.nix` and edit values  
-2) Create a host entry under `hosts/<your-host>/`  
-3) Run a dry build with your host config  
-4) Switch when you’re ready
+1. Copy `vars/example.nix` → `vars/local.nix` and edit values
+2. Create a host entry under `hosts/<your-host>/`
+3. Run a dry build with your host config
+4. Switch when you’re ready
 
 ---
 
@@ -37,18 +36,44 @@ nixos-flowback-infra/
     base.nix
     aliases.nix
     remote-unlock.nix
+    hardening.nix
+    vim-yaml.nix
+    prompt-timestamp.nix
   vars/
     example.nix
     local.nix                      # ignored (your real values)
   .gitignore
   README.md
-````
+```
 
 * `hosts/<name>/configuration.nix` = host entry point (imports modules + hardware)
 * `modules/*.nix` = reusable building blocks (base services, aliases, remote unlock)
 * `vars/example.nix` = safe template values (commit)
 * `vars/local.nix` = real host values (DO NOT commit)
 * `hosts/*/hardware-configuration.nix` = ignored (DO NOT commit)
+
+---
+
+## Modules
+
+* `modules/base.nix` – Base OS defaults (SSH hardening, rootless Docker, base packages).
+* `modules/aliases.nix` – Shell aliases wired through `vars/*` for portability.
+* `modules/remote-unlock.nix` – Optional initrd SSH for remote LUKS unlock (keys stay out of git).
+* `modules/hardening.nix` – Baseline hardening (audit/sysctl/journald/dbus-broker reload fix).
+* `modules/prompt-timestamp.nix` – Timestamp + username prompt prefix for all users.
+* `modules/vim-yaml.nix` – Vim defaults for YAML (2-space indent, etc.).
+
+### Enabling optional modules
+
+```nix
+imports = [
+  ../../modules/hardening.nix
+  ../../modules/prompt-timestamp.nix
+];
+
+flowback.hardening.enable = true;
+flowback.promptTimestamp.enable = true;
+```
 
 ---
 
@@ -142,23 +167,7 @@ sudo nixos-rebuild dry-build -I nixos-config=hosts/laptop2/configuration.nix
 sudo nixos-rebuild switch -I nixos-config=hosts/laptop2/configuration.nix
 ```
 
----
-
-## Git strategy (current + future)
-
-### Current phase (today)
-
-* **GitHub = source of truth**
-* **Forgejo = internal mirror**
-* You pull from GitHub and push to Forgejo.
-
-### Future phase (when stable)
-
-* **Forgejo = source of truth**
-* **GitHub = mirror**
-* You push to Forgejo and mirror to GitHub.
-
-Keep secrets out of git in both phases (tokens, deploy keys, runner tokens).
+##
 
 ---
 
@@ -167,3 +176,4 @@ Keep secrets out of git in both phases (tokens, deploy keys, runner tokens).
 * `hardware-configuration.nix` is intentionally **ignored** because it is tied to disks, UUIDs, and hardware layout.
 * `remote-unlock.nix` depends on secrets existing under `/etc/secrets/` on the target host (only if enabled).
 * Prefer host-specific settings in `vars/local.nix` so onboarding a new machine is mostly “copy + edit variables”.
+

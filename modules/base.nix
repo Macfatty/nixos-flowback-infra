@@ -67,14 +67,6 @@
     docker docker-compose
   ];
 
-  # Your helper aliases (can be moved into a dedicated module later)
-  environment.shellAliases = {
-    fb-help = "sh /persist/scripts/fb-help.sh";
-    fb-sync = "sh /persist/scripts/fb-sync.sh";
-    fb-up   = "docker-compose -f /persist/compose/flowback/docker-compose.yml up -d --build";
-    fb-logs = "docker-compose -f /persist/compose/flowback/docker-compose.yml logs -f";
-    nix-switch = "sudo nixos-rebuild switch";
-  };
 
   # Allow unfree packages (if needed later)
   nixpkgs.config.allowUnfree = true;

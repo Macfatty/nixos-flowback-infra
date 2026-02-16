@@ -16,3 +16,7 @@ hosts/*/hardware-configuration.nix
 secrets/
 **/secrets/
 
+
+# Nix build outputs
+result
+result-*
