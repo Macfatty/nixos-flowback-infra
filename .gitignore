@@ -20,3 +20,9 @@ secrets/
 # Nix build outputs
 result
 result-*
+
+# VM artifacts (never commit)
+*.qcow2
+result
+hosts/**/config-vm.nix
+
