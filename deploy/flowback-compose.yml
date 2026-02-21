@@ -1,0 +1,86 @@
+# deploy/flowback-compose.yml
+services:
+  # --- DATABASES ---
+  flowback-postgresql:
+    image: postgres:16.2
+    container_name: flowback-postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${FLOWBACK_PSQL_NAME}
+      POSTGRES_USER: ${FLOWBACK_PSQL_USER}
+      POSTGRES_PASSWORD: ${FLOWBACK_PSQL_PASSWORD}
+    volumes:
+      - /persist/compose/flowback/data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FLOWBACK_PSQL_USER} -d ${FLOWBACK_PSQL_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flowback-shared-net
+
+  flowback-redis:
+    image: redis:7-alpine
+    container_name: flowback-redis
+    restart: unless-stopped
+    volumes:
+      - /persist/compose/flowback/data/redis:/data
+    networks:
+      - flowback-shared-net
+
+  # --- APPLICATION (Using pre-built images from Registry) ---
+  flowback-backend:
+    # Changed from 'build:' to 'image:' for true portability
+    image: git.local/ayuub/flowback-backend:latest
+    container_name: flowback-backend
+    restart: unless-stopped
+    environment:
+      - FLOWBACK_PSQL_NAME=${FLOWBACK_PSQL_NAME}
+      - FLOWBACK_PSQL_USER=${FLOWBACK_PSQL_USER}
+      - FLOWBACK_PSQL_PASSWORD=${FLOWBACK_PSQL_PASSWORD}
+      - FLOWBACK_PSQL_HOST=flowback-postgresql
+      - FLOWBACK_PSQL_PORT=5432
+      - FLOWBACK_REDIS_HOST=flowback-redis
+      - FLOWBACK_REDIS_PORT=6379
+      - DEBUG=${DEBUG}
+      - DJANGO_SECRET=${DJANGO_SECRET}
+    depends_on:
+      flowback-postgresql:
+        condition: service_healthy
+      flowback-redis:
+        condition: service_started
+    networks:
+      - flowback-shared-net
+
+  flowback-frontend:
+    # Changed from 'build:' to 'image:' for true portability
+    image: git.local/ayuub/flowback-frontend:latest
+    container_name: flowback-frontend
+    restart: unless-stopped
+    environment:
+      - PUBLIC_API_URL=/api
+      - ORIGIN=http://flowback.local
+    depends_on:
+      - flowback-backend
+    networks:
+      - flowback-shared-net
+
+  # --- GATEWAY ---
+  flowback-gateway:
+    image: caddy:2
+    container_name: flowback-gateway
+    restart: unless-stopped
+    depends_on:
+      - flowback-frontend
+      - flowback-backend
+    ports:
+      - "80:80"
+    volumes:
+      # Reads Caddyfile directly from the deploy directory in this repo
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - flowback-shared-net
+
+networks:
+  flowback-shared-net:
+    external: true

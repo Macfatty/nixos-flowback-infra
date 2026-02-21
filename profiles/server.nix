@@ -13,6 +13,7 @@
     ../modules/users.nix
     ../modules/hardening.nix
     ../modules/prompt-timestamp.nix
+    ../modules/scripts.nix
   ];
 
   # Enable baseline hardening

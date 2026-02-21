@@ -2,8 +2,13 @@
   # ---------------------------------------------------------------------------
   # Paths
   # ---------------------------------------------------------------------------
+  # Directory for helper scripts (e.g., fb-help, fb-sync)
   scriptsDir = "/persist/scripts";
-  flowbackCompose = "/persist/compose/flowback/docker-compose.yml";
+
+  # Paths to the Compose files inside the cloned infrastructure repo
+  # Adjust '/opt/nixos-flowback-infra' if you clone the repo to a different path
+  forgejoCompose = "/opt/nixos-flowback-infra/deploy/forgejo-compose.yml";
+  flowbackCompose = "/opt/nixos-flowback-infra/deploy/flowback-compose.yml";
 
   # ---------------------------------------------------------------------------
   # Host identity
@@ -24,14 +29,13 @@
 
   allowedTCPPorts = [ 22 2222 3001 8000 3000 8080 80 ];
 
-
   # ---------------------------------------------------------------------------
   # Main user (portable)
   # ---------------------------------------------------------------------------
 
   # Required: the primary admin user for the host.
   mainUserName = "CHANGE_ME";
- 
+
    # SSH public keys allowed for:
   # - normal SSH login (port 22)
   # - initrd remote unlock SSH (port 2222), if enabled
@@ -48,4 +52,3 @@
   # Example:
   # mainUserPasswordHashFile = "/etc/secrets/users/CHANGE_ME.shadowhash";
 }
-
